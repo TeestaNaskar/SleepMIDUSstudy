@@ -1,0 +1,355 @@
+---
+title: "midus2_sleep__data_cleaning"
+format:
+  html:
+    toc: TRUE
+    number-sections: true
+    highlight-style: github
+execute:
+  warning: false
+  echo : false
+---
+
+## input {.scrollable}
+
+
+```{r}
+
+# Load all the packages
+list.of.packages <- c("readr", "tidyverse", "ltm", "lubridate")
+
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages, dependencies = TRUE)
+
+invisible(lapply(list.of.packages, library, character.only = TRUE))
+
+
+df <- read_csv("midus_sleep_project.csv")
+df[df == "NA"] <- NA
+
+# support availability : these two items have to be reverse coded
+df$B1SE1J[df$B1SE1J == -1 | df$B1SE1J == 8] <- NA
+df$B1SE1HH[df$B1SE1HH == -1 | df$B1SE1HH == 8] <- NA
+df$B1SE1J<-7-df$B1SE1J
+df$B1SE1HH<-7-df$B1SE1HH
+
+
+# renaming the variables
+df$B4BHOMAIR[df$B4BHOMAIR == 99 | df$B4BHOMAIR == 98] <- NA
+df$B1PRSEX[df$B1PRSEX == 8] <- NA
+df$B4PBMI[df$B4PBMI == 998] <- NA
+
+df$B4BMSDIL6[df$B4BMSDIL6 == 998 | df$B4BMSDIL6 == 999] <- NA
+df$B4BIL6[df$B4BIL6 == 99] <- NA
+df$B4BCRP[df$B4BCRP == 98 | df$B4BCRP == 99] <- NA
+
+#purpose in life
+df$B1SPWBU1[df$B1SPWBU1 == -1 | df$B1SPWBU1 == 98] <- NA
+
+df$B4BCHOL[df$B4BCHOL == 998 | df$B4BCHOL == 999] <- NA
+df$B4BHA1C[df$B4BHA1C == 99 | df$B4BHA1C == 98] <- NA
+df$B4P1GS[df$B4P1GS == 998 | df$B4P1GS == 999 | df$B4P1GS == 997] <- NA
+df$B4P1GD[df$B4P1GD == 998 | df$B4P1GD == 999 | df$B4P1GD == 997] <- NA
+df$B4P2A[df$B4P2A == 998 | df$B4P2A == 999 | df$B4P2A == 997] <- NA
+df$B4BGLUC[df$B4BGLUC == 998 | df$B4BGLUC == 999] <- NA
+
+df$B4AD120[df$B4AD120 == 7 | df$B4AD120 == 8 | df$B4AD120 == 9] <- NA
+df$B4AD220[df$B4AD220 == 7 | df$B4AD220 == 8 | df$B4AD220 == 9] <- NA
+df$B4AD320[df$B4AD320 == 7 | df$B4AD320 == 8 | df$B4AD320 == 9] <- NA
+df$B4AD420[df$B4AD420 == 7 | df$B4AD420 == 8 | df$B4AD420 == 9] <- NA
+df$B4AD520[df$B4AD520 == 7 | df$B4AD520 == 8 | df$B4AD520 == 9] <- NA
+df$B4AD620[df$B4AD620 == 7 | df$B4AD620 == 8 | df$B4AD620 == 9] <- NA
+df$B4AD720[df$B4AD720 == 7 | df$B4AD720 == 8 | df$B4AD720 == 9] <- NA
+
+df$B4AD11[df$B4AD11 == 7 | df$B4AD11 == 8 | df$B4AD11 == 9] <- NA
+df$B4AD21[df$B4AD21 == 7 | df$B4AD21 == 8 | df$B4AD21 == 9] <- NA
+df$B4AD31[df$B4AD31 == 7 | df$B4AD31 == 8 | df$B4AD31 == 9] <- NA
+df$B4AD41[df$B4AD41 == 7 | df$B4AD41 == 8 | df$B4AD41 == 9] <- NA
+df$B4AD51[df$B4AD51 == 7 | df$B4AD51 == 8 | df$B4AD51 == 9] <- NA
+df$B4AD61[df$B4AD61 == 7 | df$B4AD61 == 8 | df$B4AD61 == 9] <- NA
+df$B4AD71[df$B4AD71 == 7 | df$B4AD71 == 8 | df$B4AD71 == 9] <- NA
+
+df$B4WS1SLT[df$B4WS1SLT == 9998 | df$B4WS1SLT == 9999] <- NA
+df$B4WS2SLT[df$B4WS2SLT == 9998 | df$B4WS2SLT == 9999] <- NA
+df$B4WS3SLT[df$B4WS3SLT == 9998 | df$B4WS3SLT == 9999] <- NA
+df$B4WS4SLT[df$B4WS4SLT == 9998 | df$B4WS4SLT == 9999] <- NA
+df$B4WS5SLT[df$B4WS5SLT == 9998 | df$B4WS5SLT == 9999] <- NA
+df$B4WS6SLT[df$B4WS6SLT == 9998 | df$B4WS6SLT == 9999] <- NA
+df$B4WS7SLT[df$B4WS7SLT == 9998 | df$B4WS7SLT == 9999] <- NA
+
+df$B4WS1EFF[df$B4WS1EFF == 998 | df$B4WS1EFF == 999] <- NA
+df$B4WS2EFF[df$B4WS2EFF == 998 | df$B4WS2EFF == 999] <- NA
+df$B4WS3EFF[df$B4WS3EFF == 998 | df$B4WS3EFF == 999] <- NA
+df$B4WS4EFF[df$B4WS4EFF == 998 | df$B4WS4EFF == 999] <- NA
+df$B4WS5EFF[df$B4WS5EFF == 998 | df$B4WS5EFF == 999] <- NA
+df$B4WS6EFF[df$B4WS6EFF == 998 | df$B4WS6EFF == 999] <- NA
+df$B4WS7EFF[df$B4WS7EFF == 998 | df$B4WS7EFF == 999] <- NA
+
+df$B4WS1ST[df$B4WS1ST == 9998 | df$B4WS1ST == 9999] <- NA
+df$B4WS2ST[df$B4WS2ST == 9998 | df$B4WS2ST == 9999] <- NA
+df$B4WS3ST[df$B4WS3ST == 9998 | df$B4WS3ST == 9999] <- NA
+df$B4WS4ST[df$B4WS4ST == 9998 | df$B4WS4ST == 9999] <- NA
+df$B4WS5ST[df$B4WS5ST == 9998 | df$B4WS5ST == 9999] <- NA
+df$B4WS6ST[df$B4WS6ST == 9998 | df$B4WS6ST == 9999] <- NA
+df$B4WS7ST[df$B4WS7ST == 9998 | df$B4WS7ST == 9999] <- NA
+
+df$B1SPKINS[df$B1SPKINS == "-1" | df$B1SPKINS == 8] <- NA
+
+df$B4WS1ET[df$B4WS1ET == 9998 | df$B4WS1ET == 9999] <- NA
+df$B4WS2ET[df$B4WS2ET == 9998 | df$B4WS2ET == 9999] <- NA
+df$B4WS3ET[df$B4WS3ET == 9998 | df$B4WS3ET == 9999] <- NA
+df$B4WS4ET[df$B4WS4ET == 9998 | df$B4WS4ET == 9999] <- NA
+df$B4WS5ET[df$B4WS5ET == 9998 | df$B4WS5ET == 9999] <- NA
+df$B4WS6ET[df$B4WS6ET == 9998 | df$B4WS6ET == 9999] <- NA
+df$B4WS7ET[df$B4WS7ET == 9998 | df$B4WS7ET == 9999] <- NA
+
+
+
+
+# Function to calculate the mean as function of date such as "2347", "147", "47" or "7"
+moyenne_heure <- function(h_couche, h_leve) {
+  if (is.na(h_couche) || is.na(h_leve)) {
+    return(NA)
+  }
+    # Convert HHMM, HMM, H ou M in hour or minute
+  if (nchar(h_couche) == 4) {
+    h_couche_heures <- as.integer(substr(h_couche, 1, 2))
+    h_couche_minutes <- as.integer(substr(h_couche, 3, 4))
+  } else if (nchar(h_couche) == 3) {
+    if (as.integer(h_couche) < 60) {
+      h_couche_heures <- 0
+      h_couche_minutes <- as.integer(h_couche)
+    } else {
+      h_couche_heures <- as.integer(substr(h_couche, 1, 1))
+      h_couche_minutes <- as.integer(substr(h_couche, 2, 3))
+    }
+  } else if (nchar(h_couche) == 2) {
+    h_couche_heures <- 0
+    h_couche_minutes <- as.integer(h_couche)
+  } else if (nchar(h_couche) == 1) {
+    h_couche_heures <- 0
+    h_couche_minutes <- as.integer(h_couche)
+  }
+  
+  if (nchar(h_leve) == 4) {
+    h_leve_heures <- as.integer(substr(h_leve, 1, 2))
+    h_leve_minutes <- as.integer(substr(h_leve, 3, 4))
+  } else if (nchar(h_leve) == 3) {
+    if (as.integer(h_leve) < 60) {
+      h_leve_heures <- 0
+      h_leve_minutes <- as.integer(h_leve)
+    } else {
+      h_leve_heures <- as.integer(substr(h_leve, 1, 1))
+      h_leve_minutes <- as.integer(substr(h_leve, 2, 3))
+    }
+  } else if (nchar(h_leve) == 2) {
+    h_leve_heures <- 0
+    h_leve_minutes <- as.integer(h_leve)
+  } else if (nchar(h_leve) == 1) {
+    h_leve_heures <- 0
+    h_leve_minutes <- as.integer(h_leve)
+  }
+  
+  # Create POSIXct objects by using today's date
+  date <- Sys.Date()
+  h_couche <- make_datetime(year(date), month(date), day(date), hour = h_couche_heures, min  = h_couche_minutes, tz = "UTC")
+  h_leve <- make_datetime(year(date), month(date), day(date), hour = h_leve_heures, min  = h_leve_minutes, tz = "UTC")
+  
+  # modify if the waking hour is after midnight 
+  if (h_leve < h_couche) {
+    h_leve <- h_leve + days(1)
+  }
+  
+  # Calculate the mean
+  moyenne <- h_couche + (h_leve - h_couche) / 2
+  
+  # Formater la moyenne en HHMM
+  moyenne_format <- sprintf("%02d:%02d", hour(moyenne), minute(moyenne))
+  return(moyenne_format)
+}
+
+
+# Appliquer la fonction à chaque ligne du jeu de données
+df <- df %>%
+  mutate(midpoint_day1 = mapply(moyenne_heure, B4WS1ST, B4WS1ET))%>%
+  mutate(midpoint_day2 = mapply(moyenne_heure, B4WS2ST, B4WS2ET))%>%
+  mutate(midpoint_day3 = mapply(moyenne_heure, B4WS3ST, B4WS3ET))%>%
+  mutate(midpoint_day4 = mapply(moyenne_heure, B4WS4ST, B4WS4ET))%>%
+  mutate(midpoint_day5 = mapply(moyenne_heure, B4WS5ST, B4WS5ET))%>%
+  mutate(midpoint_day6 = mapply(moyenne_heure, B4WS6ST, B4WS6ET))%>%
+  mutate(midpoint_day7 = mapply(moyenne_heure, B4WS7ST, B4WS7ET))
+
+data <- df[, c("midpoint_day1", "midpoint_day2", "midpoint_day3", "midpoint_day4",
+               "midpoint_day5", "midpoint_day6", "midpoint_day7")]
+
+# Fonction pour convertir HH:MM en minutes depuis minuit
+convertir_en_minutes <- function(heure) {
+    if (is.na(heure)) {
+    return(NA)  # Retourner NA si l'heure est manquante
+  }
+  hm <- as.numeric(unlist(strsplit(heure, ":")))
+  hours <- hm[1]
+  minutes <- hm[2]
+  
+    if (hours > 14) {
+    hours <- 24 - hours
+    }
+  
+  total_minutes <- hours * 60 + minutes
+  return(total_minutes)
+}
+
+# Calculer la moyenne de l'heure d'endormissement pour chaque participant
+moyenne_heure_endormissement <- apply(data, 1, function(row) {
+  # Convertir les heures en minutes depuis minuit pour chaque jour
+  minutes_jour1 <- convertir_en_minutes(row[1])
+  minutes_jour2 <- convertir_en_minutes(row[2])
+  minutes_jour3 <- convertir_en_minutes(row[3])
+  minutes_jour4 <- convertir_en_minutes(row[4])
+  minutes_jour5 <- convertir_en_minutes(row[5])
+  minutes_jour6 <- convertir_en_minutes(row[6])
+  minutes_jour7 <- convertir_en_minutes(row[7])
+  
+  # Calculer la moyenne des minutes depuis minuit pour les trois jours
+  moyenne_minutes <- mean(c(minutes_jour1, minutes_jour2, minutes_jour3, minutes_jour4,
+                            minutes_jour5, minutes_jour6, minutes_jour7), na.rm = TRUE)
+  
+  # Convertir la moyenne en format HH:MM
+  hours_moyenne <- floor(moyenne_minutes / 60)
+  minutes_moyenne <- round(moyenne_minutes %% 60)
+  if (!is.na(hours_moyenne) && !is.na(minutes_moyenne)) {
+    heure_moyenne <- sprintf("%02d:%02d", hours_moyenne, minutes_moyenne)
+  } else {
+    heure_moyenne <- NA
+  }
+  
+  return(heure_moyenne)
+})
+
+# Calculer la moyenne de l'heure d'endormissement pour chaque participant
+sd_heure_endormissement <- apply(data, 1, function(row) {
+  # Convertir les heures en minutes depuis minuit pour chaque jour
+  minutes_jour1 <- convertir_en_minutes(row[1])
+  minutes_jour2 <- convertir_en_minutes(row[2])
+  minutes_jour3 <- convertir_en_minutes(row[3])
+  minutes_jour4 <- convertir_en_minutes(row[4])
+  minutes_jour5 <- convertir_en_minutes(row[5])
+  minutes_jour6 <- convertir_en_minutes(row[6])
+  minutes_jour7 <- convertir_en_minutes(row[7])
+
+  sd_minutes <- sd(c(minutes_jour1, minutes_jour2, minutes_jour3, minutes_jour4,
+                            minutes_jour5, minutes_jour6, minutes_jour7), na.rm = TRUE)
+  return(sd_minutes)
+}) 
+
+# Function to determine if sleep midpoint falls between 2:00 am and 4:00 am
+assign_quality_score <- function(midpoint_time) {
+  if (is.na(midpoint_time)) {
+  return(NA)  # Retourner NA si l'heure est manquante
+  }
+  # Convert midpoint_time to hours and minutes
+  hm <- as.numeric(unlist(strsplit(midpoint_time, ":")))
+  hours <- hm[1]
+  minutes <- hm[2]
+  
+  # Calculate total minutes from midnight
+  total_minutes <- hours * 60 + minutes
+  
+  # Check if sleep midpoint is between 2:00 am (120 minutes) and 4:00 am (240 minutes)
+  if (total_minutes >= 120 & total_minutes <= 240) {
+    return(1)  # Assign +1 if within the specified range
+  } else {
+    return(0)  # Otherwise, assign 0
+  }
+}
+
+df$Timing <- moyenne_heure_endormissement
+df$Regularity <- sd_heure_endormissement
+
+# Apply the function to each row in the dataset
+quality_score_timing <- sapply(df$Timing, assign_quality_score)
+df$quality_score_timing <- as.numeric(quality_score_timing)
+
+
+df<- df |> rowwise() %>%mutate(Efficiency = mean(c_across(c("B4WS1EFF","B4WS2EFF","B4WS3EFF", "B4WS4EFF", "B4WS5EFF", "B4WS6EFF", "B4WS7EFF"))))
+
+df<- df |> rowwise() %>%mutate(sleep_duration = mean(c_across(c("B4WS1SLT","B4WS2SLT","B4WS3SLT", "B4WS4SLT", "B4WS5SLT", "B4WS6SLT", "B4WS7SLT"))))
+
+df<- df |> rowwise() %>%mutate(sleep_quality = mean(c_across(c("B4AD120","B4AD220","B4AD320", "B4AD420", "B4AD520", "B4AD620", "B4AD720"))))
+
+df<- df |> rowwise() %>%mutate(Alertness = mean(c_across(c("B4AD11","B4AD21","B4AD31", "B4AD41", "B4AD51", "B4AD61", "B4AD71"))))
+
+# initiate a sleep_score variable from 0 to 6
+df$sleep_score <- 0
+
+df$sleep_score <- df$sleep_score +
+  ifelse(df$sleep_quality > 2.8, 1, 0) +
+  ifelse(df$Alertness < 2.2, 1, 0) +
+  ifelse(df$sleep_duration > 420, 1, 0) +
+  ifelse(df$Efficiency > 85, 1, 0) +
+  ifelse(df$Regularity < 60, 1, 0) +
+  ifelse(df$quality_score_timing == 1, 1, 0)
+
+```
+
+## Creating the final dataset
+
+```{r}
+
+
+df <- df %>% rename(
+   ID = MIDUSID, # ID across all MIDUS samples
+   HOMAIR = B4BHOMAIR, # Insulin resistance indicator, from 0 to 75
+   Gender = B1PRSEX, # 1 male and 2 female
+   Age = B1PAGE_M2, # 28 to 84
+   caregiving = B1PD1, # 1 yes, 2 no
+   BMI = B4PBMI, # from 15 to 65
+   Sample_id = SAMPLMAJ, # 1 CORE MAIN RDD, 2 CORE SIBLING, 3 CORE TWIN, 4 CORE CITY OVERSAMPLE
+   CRP = B4BCRP, 
+   IL6 = B4BIL6,
+   MSD_IL6 = B4BMSDIL6,
+   Life_Purpose = B1SPWBU1, # 1 = agree, 7 = disagree
+   Cholesterol = B4BCHOL,
+   Blood_hemo_AC1 = B4BHA1C,
+   BP_systolic = B4P1GS,
+   BP_diastolic = B4P1GD,
+   Waist = B4P2A,
+   Support_giving = B1SPKINS,
+   Blood_fasting_glucose = B4BGLUC,
+   sleep_duration = sleep_duration) %>% rowwise() %>% mutate(
+  Support_availability = mean(c_across(c("B1SE1V","B1SE1NN","B1SE1J", "B1SE1HH")), na.rm=FALSE))
+
+
+dataset <- df[, c("ID",
+                 'Gender',
+                 'Age',
+                 'HOMAIR',
+                 "caregiving",
+                 'Support_availability',
+                 'BMI',
+                 'Sample_id',
+                 "CRP",
+                 "IL6",
+                 "MSD_IL6",
+                 "Cholesterol",
+                 "Life_Purpose",
+                 "Blood_hemo_AC1",
+                 "BP_systolic",
+                "BP_diastolic",
+                "Waist",
+                "Blood_fasting_glucose",
+                "sleep_duration",
+                "sleep_quality",
+                "Alertness",
+                "Timing",
+                "Support_giving",
+                "Regularity",
+                "Efficiency",
+                "sleep_score"
+                 )]
+
+openxlsx::write.xlsx(dataset, "dataset.xlsx", keepNA = TRUE, na.string = '')
+
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).

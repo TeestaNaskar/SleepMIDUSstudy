@@ -1,0 +1,196 @@
+---
+title: "Midus2 Sleep Project Analysis"
+format: 
+  html:
+    code-fold: true
+    toc: true
+    theme: darkly
+    fontsize: 1em
+    code-tools: 
+      source: true
+      toggle: TRUE
+      caption: none
+---
+
+```{r include = FALSE}
+
+options(dplyr.summarise.inform = FALSE)
+packages <- c("readxl", "tidyverse", "stargazer", "modelsummary", "table1", "car", 'meta', 'performance', "knitr", "lubridate", "grateful")
+if (!all(packages %in% (.packages()))) {
+  invisible(lapply(packages,FUN= function(x) {
+    if (!require(x, character.only     = TRUE)) {
+      install.packages(x, dependencies = TRUE)
+      }
+    library(x, character.only          = TRUE)
+    }))
+}
+dataset <- read_xlsx("dataset.xlsx")
+dataset$Timing2 <- hm(dataset$Timing)
+dataset$Timing_minute <- hour(dataset$Timing2)*60 + minute(dataset$Timing2)
+
+```
+
+## Prepare data for modeling
+
+
+```{r Data Prep, echo=FALSE}
+
+dataset$Gender <- factor(dataset$Gender, levels = c(1, 2), labels = c('Male', 'Female'))
+dataset$caregiving<-factor(dataset$caregiving, levels = c(1, 2), labels = c('Yes', 'No'))
+
+
+```
+
+## Look at the population
+
+This chunk created an HTML file called popTableAll with proportions for all variables.
+
+``` {r Population Characteristics, echo=FALSE}
+#| code-fold: true
+#| code-summary: "Show the code"
+
+popTableAll <- table1(~HOMAIR + Gender + Age + caregiving + Support_availability + Support_giving + BMI + CRP + IL6+ MSD_IL6 + Cholesterol + Life_Purpose + Blood_hemo_AC1 + BP_systolic + BP_diastolic + Waist +  Blood_fasting_glucose + sleep_duration + sleep_quality +  Alertness + Timing + Regularity + Efficiency, data=dataset)
+
+
+htmltools::save_html(popTableAll, file='popTableAll.html')
+
+
+
+```
+
+Our objectives is to create models for the relationship between support_giving, life purpose and sleep/metabolic diseases.
+
+1.	Determine whether social support giving, receiving, and/or perceived purpose moderate the relationship between  sleep health and cardiometabolic disease risk factors (e.g. IL-6, HOMO-IR, CRP):
+	1.1 H1a: Poor sleep health (composite score and individual measures) will be associated with higher cardiometabolic risk
+  1.2 H1b: These associations will be moderated by social support (giving/receiving) and purpose (worse in those with low vs. high social support/purpose) 
+2.	Determine whether these moderating variables are gender (or race) specific
+
+
+## 1.1 H1a: Poor sleep health (composite score and individual measures) will be associated with higher cardiometabolic risk
+
+``` {r Initial Model homair, echo=FALSE}
+
+
+
+mod_list_test <- lapply(c(4,9:12, 14, 18), function(k) {
+     frm <- as.formula(paste(names(dataset)[k],"~sleep_duration + sleep_quality + sleep_score + Efficiency + Regularity + Alertness + Timing_minute + Gender + Age"))
+     lm(frm, data=dataset)
+ })
+
+stargazer(mod_list_test, header = F, ci=TRUE, type = "text", report=("vc*sp"))
+
+```
+
+## 1.2 H1b: These associations will be moderated by social support (giving/receiving) and purpose (worse in those with low vs. high social support/purpose)
+
+### Sleep Duration moderation
+``` {r sleep_duration moderation, echo=FALSE}
+mod_sleep_duration <- lapply(c(4,9:12, 14, 18), function(k) {
+     frm <- as.formula(paste(names(dataset)[k],"~sleep_duration*Support_giving*Support_availability*Life_Purpose"))
+     lm(frm, data=dataset)
+ })
+
+stargazer(mod_sleep_duration, header = F, ci=TRUE, type = "text", report=("vc*sp"))
+
+```
+
+### Sleep Quality moderation
+
+``` {r sleep_quality moderation, echo=FALSE}
+mod_sleep_quality <- lapply(c(4,9:12, 14, 18), function(k) {
+     frm <- as.formula(paste(names(dataset)[k],"~sleep_quality*Support_giving*Support_availability*Life_Purpose"))
+     lm(frm, data=dataset)
+ })
+
+stargazer(mod_sleep_quality, header = F, ci=TRUE, type = "text", report=("vc*sp"))
+
+```
+
+### sleep_score moderation
+``` {r sleep_score moderation, echo=FALSE}
+mod_sleep_score <- lapply(c(4,9:12, 14, 18), function(k) {
+     frm <- as.formula(paste(names(dataset)[k],"~ sleep_score*Support_giving*Support_availability*Life_Purpose "))
+     lm(frm, data=dataset)
+ })
+
+stargazer(mod_sleep_score, header = F, ci=TRUE, type = "text", report=("vc*sp"))
+
+```
+
+### Efficiency moderation
+``` {r Efficiency moderation, echo=FALSE}
+mod_Efficiency <- lapply(c(4,9:12, 14, 18), function(k) {
+     frm <- as.formula(paste(names(dataset)[k],"~ Efficiency*Support_giving*Support_availability*Life_Purpose "))
+     lm(frm, data=dataset)
+ })
+
+stargazer(mod_Efficiency, header = F, ci=TRUE, type = "text", report=("vc*sp"))
+
+```
+
+### Regularity moderation
+``` {r Regularity moderation, echo=FALSE}
+mod_Regularity <- lapply(c(4,9:12, 14, 18), function(k) {
+     frm <- as.formula(paste(names(dataset)[k],"~ Regularity*Support_giving*Support_availability*Life_Purpose "))
+     lm(frm, data=dataset)
+ })
+
+stargazer(mod_Regularity, header = F, ci=TRUE, type = "text", report=("vc*sp"))
+
+```
+
+### Alertness moderation
+``` {r Alertness moderation, echo=FALSE}
+mod_Alertness <- lapply(c(4,9:12, 14, 18), function(k) {
+     frm <- as.formula(paste(names(dataset)[k],"~ Alertness*Support_giving*Support_availability*Life_Purpose "))
+     lm(frm, data=dataset)
+ })
+
+stargazer(mod_Alertness, header = F, ci=TRUE, type = "text", report=("vc*sp"))
+
+```
+
+### Timing (in minutes) moderation
+``` {r Timing moderation, echo=FALSE}
+mod_Timing_minute <- lapply(c(4,9:12, 14, 18), function(k) {
+     frm <- as.formula(paste(names(dataset)[k],"~ Timing_minute*Support_giving*Support_availability*Life_Purpose "))
+     lm(frm, data=dataset)
+ })
+
+stargazer(mod_Timing_minute, header = F, ci=TRUE, type = "text", report=("vc*sp"))
+
+```
+
+## 2.	Determine whether these moderating variables are gender (or race) specific
+
+In H1A we have the data associated with Gender and Age. We need to add Race.
+``` {r Gender_race, echo=FALSE}
+
+
+
+```
+
+
+
+
+# INFO: Environment and packages used
+
+This code export a "grateful_export" to cite packages used.
+```{r}
+
+print("R version:")
+version$version.string
+
+print("Rstudio version:")
+rstudioversion <- rstudioapi::versionInfo()
+rstudioversion$version
+
+cite_packages(pkgs  = c("readxl", "tidyverse", "stargazer", "modelsummary", "table1", "car", 'meta', 'performance', "knitr", "lubridate", "grateful"), include.RStudio = TRUE, out.dir = getwd())  
+
+```
+
+# References
+
+---
+nocite: '@*'
+...
